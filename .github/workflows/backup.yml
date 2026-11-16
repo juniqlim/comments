@@ -1,0 +1,34 @@
+name: 댓글 백업
+
+on:
+  schedule:
+    - cron: '0 18 * * *' # 매일 03:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 댓글은 누구나 읽을 수 있으니 공개 키로 충분하다.
+      # 매일 두드리니 무료 Supabase 가 잠들지도 않는다.
+      - name: 댓글을 받는다
+        run: |
+          mkdir -p backup
+          curl -sf "https://zuvifgiiahbypxsvnzvg.supabase.co/rest/v1/comments?select=*&order=created_at,id" \
+            -H "apikey: $(grep -o "eyJ[^']*" src/comments.js)" \
+            -H "Accept-Profile: comments" \
+            | jq . > backup/comments.json
+
+      - name: 바뀐 것을 남긴다
+        run: |
+          git config user.name 'comments'
+          git config user.email 'noreply@github.com'
+          git add backup/comments.json
+          git diff --cached --quiet && echo '바뀐 것 없음' && exit 0
+          git commit -m '댓글 백업'
+          git push
