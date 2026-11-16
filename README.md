@@ -10,6 +10,10 @@
 - 권한 — RLS (`db/schema.sql`). 읽기는 누구나, 쓰기는 본인, 지우기는 본인과 주인
 - 페이지 — origin + 경로. `.html` 과 `index` 는 떼고 본다
 
+## 백업
+
+작성자 이메일이 들어가므로 비공개 저장소 `juniqlim/comments-backup` 에 둔다.
+
 ## 사이트 추가
 
 Supabase → Authentication → URL Configuration 의 Redirect URLs 에 `https://<사이트>/**` 를 넣는다.
